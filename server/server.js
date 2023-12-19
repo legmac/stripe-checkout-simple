@@ -6,7 +6,7 @@ const cors = require("cors")
 app.use(express.json())
 app.use(
   cors({
-    origin: "http://localhost:5500",
+    origin: ["http://localhost:8080","http://127.0.0.1:8080"]
   })
 )
 
@@ -19,25 +19,45 @@ const storeItems = new Map([
 
 app.post("/create-checkout-session", async (req, res) => {
   try {
+    // const session = await stripe.checkout.sessions.create({
+    //   payment_method_types: ["card"],
+    //   mode: "payment",
+    //   line_items: req.body.items.map(item => {
+    //     const storeItem = storeItems.get(item.id)
+    //     return {
+    //       price_data: {
+    //         currency: "usd",
+    //         product_data: {
+    //           name: storeItem.name,
+    //         },
+    //         unit_amount: storeItem.priceInCents,
+    //       },
+    //       quantity: item.quantity,
+    //     }
+    //   }),
+    //   success_url: `${process.env.CLIENT_URL}/success.html`,
+    //   cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
+    // })
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      mode: "payment",
-      line_items: req.body.items.map(item => {
-        const storeItem = storeItems.get(item.id)
-        return {
+      line_items: [
+        {
           price_data: {
-            currency: "usd",
+            currency: "eur",
             product_data: {
-              name: storeItem.name,
+              name: "Cewa",
             },
-            unit_amount: storeItem.priceInCents,
+            unit_amount: 1000,
           },
-          quantity: item.quantity,
-        }
-      }),
-      success_url: `${process.env.CLIENT_URL}/success.html`,
-      cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
-    })
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: "http://sitename.com/checkout-success",
+      cancel_url: "http://sitename.com/checkout-cancel",
+    });
+
     res.json({ url: session.url })
   } catch (e) {
     res.status(500).json({ error: e.message })

@@ -17,6 +17,7 @@ button.addEventListener("click", () => {
       return res.json().then(json => Promise.reject(json))
     })
     .then(({ url }) => {
+      // console.log(url)
       window.location = url
     })
     .catch(e => {
